@@ -1,0 +1,29 @@
+<?php
+/**
+ * @file
+ * Install, update, and uninstall functions for the Bot Pull Request module.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function bot_pullreq_schema() {
+  $schema['bot_pullreq'] = array(
+    'description' => 'Table necessary for storage projects.',
+    'fields' => array(
+      'name' => array(
+        'description' => 'Project name',
+        'not null'    => TRUE,
+        'type'        => 'varchar',
+        'length'      => 255,
+      ),
+      'members' => array(
+        'description' => 'Project members',
+        'not null'    => TRUE,
+        'type'        => 'text',
+      ),
+    ),
+    'key' => array('name'),
+  );
+  return $schema;
+}

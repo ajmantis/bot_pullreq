@@ -1,0 +1,83 @@
+<?php
+/**
+ * @file
+ * Enables choose to a random member for merge a pull request of one project.
+ */
+
+/**
+ * Implements hook_help().
+ */
+function bot_pullreq_help($path, $arg) {
+  //#TODO: Soon...
+}
+
+/**
+ * Implements hook_menu().
+ */
+function bot_pullreq_menu() {
+  $items['bot/pullreq'] = array(
+    'access arguments'  => array('access bot'),
+    'description'       => "Browse all projects with their members.",
+    'page callback'     => 'bot_pullreq_results',
+  ),
+
+  return $items;
+}
+
+/**
+ * Browse all projects with their members.
+ */
+function bot_pullreq_results() {
+  $rows = array();
+}
+
+/**
+ * Listen for conversation directed at, or about, the bot.
+ *
+ * @param $data
+ *   The regular $data object prepared by the IRC library.
+ * @param $from_query
+ *   Boolean; whether this was a queried request.
+ */
+function bot_pullreq_irc_msg_channel($data, $from_query = FALSE) {
+  //#TODO: DO SOMETHING!!
+}
+
+/**
+ * All responses are available via a query.
+ */
+function bot_pullreq_irc_msg_query($data) {
+  bot_pullreq_irc_msg_channel($data, TRUE);
+}
+
+
+/**
+ * REMINDER 1:
+ * bot addproject projectname person1 person2
+ * Create and/or add people to the project.
+ */
+
+/**
+ * REMINDER 2:
+ * bot rmproject projectname person1 person2
+ * Remove people from the project.
+ */
+
+/**
+ * REMINDER 3:
+ * bot delproject projectname
+ * Delete that project.
+ */
+
+/**
+ * REMINDER 4:
+ * bot pullreq projectname
+ * Chooses a random member of the project
+ * Excepts except whoever said the command.
+ */
+
+/**
+ * REMINDER 5:
+ * bot project projectname
+ * Show project members.
+ */
