@@ -3,3 +3,4 @@ package = Bot
 dependencies[] = bot
 description = "Enables choose to a random member for merge a pull request of one project."
 core = 7.x
+files[] = includes/PullReq.inc

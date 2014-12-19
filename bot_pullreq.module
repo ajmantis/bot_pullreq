@@ -8,7 +8,7 @@
  * Implements hook_help().
  */
 function bot_pullreq_help($path, $arg) {
-  //#TODO: Soon...
+  // @TODO: Soon... Very soon...
 }
 
 /**
@@ -16,68 +16,102 @@ function bot_pullreq_help($path, $arg) {
  */
 function bot_pullreq_menu() {
   $items['bot/pullreq'] = array(
-    'access arguments'  => array('access bot'),
-    'description'       => "Browse all projects with their members.",
-    'page callback'     => 'bot_pullreq_results',
-  ),
+    'access arguments' => array('access bot'),
+    'description' => "Browse all projects with their members.",
+    'page callback' => 'bot_pullreq_results',
+  );
 
   return $items;
 }
 
 /**
  * Browse all projects with their members.
+ * @return render_array
  */
 function bot_pullreq_results() {
+  // @TODO: FINISH IT!!
   $rows = array();
+  //return theme('table', $header, $rows, $table_attributes);
 }
 
 /**
  * Listen for conversation directed at, or about, the bot.
- *
- * @param $data
- *   The regular $data object prepared by the IRC library.
- * @param $from_query
- *   Boolean; whether this was a queried request.
+ * @param  [type]  $data       [description]
+ * @param  boolean $from_query [description]
+ * @return [type]              [description]
  */
 function bot_pullreq_irc_msg_channel($data, $from_query = FALSE) {
-  //#TODO: DO SOMETHING!!
+  $to = empty($data->channel) ? $data->nick : $data->channel;
+  $botdata["message"] = $data->messageex;
+  $botdata["channel"] = empty($data->channel) ? "" : $data->channel;
+  $botdata["nick"] = $data->nick;
+  $pullreq = new PullReq();
+
+  switch ($data->messageex[0]) {
+    case "addProject":
+      $result = $pullreq->addProject($botdata);
+      break;
+
+    case "addMember":
+      $result = $pullreq->addMember($botdata);
+      break;
+
+    case "delMember":
+      $result = $pullreq->delMember($botdata);
+      break;
+
+    case "delProject":
+      $result = $pullreq->delProject($botdata);
+      break;
+
+    case "getAllMembers":
+      $result = $pullreq->getAllMembers($botdata);
+      break;
+
+    case "pullreq":
+      $result = $pullreq->pullreq($botdata);
+      break;
+
+    default:
+      return 0;
+  }
+
+  bot_message($to, $result["msg"]);
+
+  return 0;
 }
 
 /**
  * All responses are available via a query.
+ * @param  [type] $data [description]
+ * @return [type]       [description]
  */
 function bot_pullreq_irc_msg_query($data) {
   bot_pullreq_irc_msg_channel($data, TRUE);
 }
 
-
 /**
- * REMINDER 1:
- * bot addproject projectname person1 person2
- * Create and/or add people to the project.
- */
+PUBLIC NAME
+class Net_SmartIRC_data#115 (11) {
+  public $nick => string(7) "Saphyel"
+  public $channel => string(9) "#osgeo-es"
+  public $messageex =>
+  array(3) {
+    [0] => string(6) "Botijo"
+    [1] => string(3) "haz"
+    [2] => string(4) "algo"
+  }
+}
 
-/**
- * REMINDER 2:
- * bot rmproject projectname person1 person2
- * Remove people from the project.
- */
-
-/**
- * REMINDER 3:
- * bot delproject projectname
- * Delete that project.
- */
-
-/**
- * REMINDER 4:
- * bot pullreq projectname
- * Chooses a random member of the project
- * Excepts except whoever said the command.
- */
-
-/**
- * REMINDER 5:
- * bot project projectname
- * Show project members.
- */
+PRIVATE NAME
+class Net_SmartIRC_data#115 (11) {
+  public $nick => string(7) "Saphyel"
+  public $channel => NULL
+  public $messageex =>
+  array(3) {
+    [0] => string(6) "Botijo"
+    [1] => string(2) "te"
+    [2] => string(4) "odio"
+  }
+}
+*/
