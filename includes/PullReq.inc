@@ -8,7 +8,7 @@ class PullReq {
   private $result;
 
   /**
-   * Construct initialize values
+   * Construct default values.
    */
   function __construct() {
     $result = array(
@@ -18,18 +18,45 @@ class PullReq {
   }
 
   /**
-   * Add new project
-   * @param $data
+   * @param $name Project name.
+   * @return Leader name.
    */
-  public function addProject($data) {
-    if (empty($data["message"][1])) {
-      return 0;
-    }
-
-    // Check if this project already exist.
+  private function getLeader($name) {
     $result = db_query('SELECT leader FROM {bot_pullreq} WHERE name = :name',
-      array(':name' => $data["message"][1])
+      array(':name' => $name)
     )->fetchField();
+    return $result;
+  }
+
+  /**
+   * @param $name Project name.
+   * @return Leader name.
+   */
+  private function getMembers($name) {
+    $result = db_query('SELECT members FROM {bot_pullreq} WHERE name = :name',
+      array(':name' => $name)
+    )->fetchField();
+    return $result;
+  }
+
+  /**
+   * @param $name Project name.
+   * @return Array members and leader.
+   */
+  private function getPeople($name) {
+    $result = db_query('SELECT leader, members FROM {bot_pullreq} WHERE name = :name',
+      array(':name' => $name)
+    )->fetchAssoc();
+    return $result;
+  }
+
+  /**
+   * Add new project
+   * @param $data Array with nick, channel and message.
+   */
+  public function setProject($data) {
+    // Check if this project already exist.
+    $result = $this->getLeader($data["message"][1]);
 
     if (empty($result)) {
       $result = db_query('INSERT INTO {bot_pullreq} (name, leader, dcreated) VALUES (:name, :leader, :dcreated)',
@@ -49,18 +76,12 @@ class PullReq {
   }
 
   /**
-   * Add member to project
-   * @param $data
+   * Add member to project.
+   * @param $data Array with nick, channel and message.
    */
-  public function addMember($data) {
-    if (count($data["message"]) < 3) {
-      return 0;
-    }
-
+  public function setMember($data) {
     // Check if this project already exist and get the leader.
-    $result = db_query('SELECT leader, members FROM {bot_pullreq} WHERE name = :name',
-      array(':name' => $data["message"][1])
-    )->fetchAssoc();
+    $result = $this->getPeople($data["message"][1]);
 
     if (empty($result)) {
       $this->result['msg'] = "Project not found.";
@@ -85,17 +106,11 @@ class PullReq {
 
   /**
    * Delete member from project
-   * @param $data
+   * @param $data Array with nick, channel and message.
    */
   public function delMember($data) {
-    if (count($data["message"]) < 3) {
-      return 0;
-    }
-
     // Check if this project already exist and get the owner.
-    $result = db_query('SELECT leader, members FROM {bot_pullreq} WHERE name = :name',
-      array(':name' => $data["message"][1])
-    )->fetchAssoc();
+    $result = $this->getPeople($data["message"][1]);
 
     if (empty($result["leader"])) {
       $this->result['msg'] = "Project not found.";
@@ -121,17 +136,11 @@ class PullReq {
 
   /**
    * Delete project
-   * @param $data
+   * @param $data Array with nick, channel and message.
    */
   public function delProject($data) {
-    if (empty($data["message"][1])) {
-      return 0;
-    }
-
     // Check if this project already exist.
-    $result = db_query('SELECT leader FROM {bot_pullreq} WHERE name = :name',
-      array(':name' => $data["message"][1])
-    )->fetchField();
+    $result = $this->getLeader($data["message"][1]);
 
     if (empty($result)) {
       $this->result['msg'] = "Project not found.";
@@ -154,17 +163,11 @@ class PullReq {
 
   /**
    * Get all project members
-   * @param $data
+   * @param $data Array with nick, channel and message.
    */
   public function getAllMembers($data) {
-    if (empty($data["message"][1])) {
-      return 0;
-    }
-
     // Check if this project already exist.
-    $result = db_query('SELECT members FROM {bot_pullreq} WHERE name = :name',
-      array(':name' => $data["message"][1])
-    )->fetchField();
+    $result = $this->getMembers($data["message"][1]);
 
     if (empty($result)) {
       $this->result['msg'] = "Project not found.";
@@ -178,17 +181,11 @@ class PullReq {
 
   /**
    * Get a random project member
-   * @param $data
+   * @param $data Array with nick, channel and message.
    */
   public function pullreq($data) {
-    if (empty($data["message"][1])) {
-      return 0;
-    }
-
     // Check if this project already exist.
-    $result = db_query('SELECT members FROM {bot_pullreq} WHERE name = :name',
-      array(':name' => $data["message"][1])
-    )->fetchField();
+    $result = $this->getMembers($data["message"][1]);
 
     if (empty($result)) {
       $this->result['msg'] = "Project not found.";

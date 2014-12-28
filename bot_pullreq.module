@@ -35,28 +35,38 @@ function bot_pullreq_results() {
 }
 
 /**
- * Listen for conversation directed at, or about, the bot.
- * @param  [type]  $data       [description]
- * @param  boolean $from_query [description]
- * @return [type]              [description]
+ * Read conversations.
+ * @param $data object with all information.
+ * @param bool $from_query
+ * @return int exit!
  */
 function bot_pullreq_irc_msg_channel($data, $from_query = FALSE) {
   $to = empty($data->channel) ? $data->nick : $data->channel;
   $botdata["message"] = $data->messageex;
   $botdata["channel"] = empty($data->channel) ? "" : $data->channel;
   $botdata["nick"] = $data->nick;
+
+  if (count($botdata["message"]) < 2) {
+    return 0;
+  }
   $pullreq = new PullReq();
 
-  switch ($data->messageex[0]) {
+  switch ($botdata["message"][0]) {
     case "addProject":
-      $result = $pullreq->addProject($botdata);
+      $result = $pullreq->setProject($botdata);
       break;
 
     case "addMember":
-      $result = $pullreq->addMember($botdata);
+      if (count($botdata["message"]) < 3) {
+        return 0;
+      }
+      $result = $pullreq->setMember($botdata);
       break;
 
     case "delMember":
+      if (count($botdata["message"]) < 3) {
+        return 0;
+      }
       $result = $pullreq->delMember($botdata);
       break;
 
@@ -78,40 +88,12 @@ function bot_pullreq_irc_msg_channel($data, $from_query = FALSE) {
 
   bot_message($to, $result["msg"]);
 
-  return 0;
 }
 
 /**
- * All responses are available via a query.
- * @param  [type] $data [description]
- * @return [type]       [description]
+ * Read query messages.
+ * @param $data object with all information.
  */
 function bot_pullreq_irc_msg_query($data) {
   bot_pullreq_irc_msg_channel($data, TRUE);
 }
-
-/**
-PUBLIC NAME
-class Net_SmartIRC_data#115 (11) {
-  public $nick => string(7) "Saphyel"
-  public $channel => string(9) "#osgeo-es"
-  public $messageex =>
-  array(3) {
-    [0] => string(6) "Botijo"
-    [1] => string(3) "haz"
-    [2] => string(4) "algo"
-  }
-}
-
-PRIVATE NAME
-class Net_SmartIRC_data#115 (11) {
-  public $nick => string(7) "Saphyel"
-  public $channel => NULL
-  public $messageex =>
-  array(3) {
-    [0] => string(6) "Botijo"
-    [1] => string(2) "te"
-    [2] => string(4) "odio"
-  }
-}
-*/
