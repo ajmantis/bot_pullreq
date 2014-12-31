@@ -15,56 +15,44 @@ function bot_pullreq_help($path, $arg) {
  * Implements hook_menu().
  */
 function bot_pullreq_menu() {
+  $items = array();
   $items['bot/pullreq'] = array(
-    'access arguments' => array('access bot'),
-    'description' => "Browse all projects with their members.",
-    'page callback' => 'bot_pullreq_results',
+    'title' => 'Pull req',
+    'description' => 'You can administer Pull req. projects.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('bot_pullreq_results_form'),
+    'file' => 'includes/bot_pullreq_results.inc',
+    'access callback' => TRUE,
   );
-
   return $items;
 }
 
 /**
- * Browse all projects with their members.
- * @return render_array
- */
-function bot_pullreq_results() {
-  // @TODO: FINISH IT!!
-  $rows = array();
-  //return theme('table', $header, $rows, $table_attributes);
-}
-
-/**
  * Read conversations.
- * @param $data object with all information.
- * @param bool $from_query
- * @return int exit!
+ * @see filter_irc_data
  */
 function bot_pullreq_irc_msg_channel($data, $from_query = FALSE) {
-  $to = empty($data->channel) ? $data->nick : $data->channel;
-  $botdata["message"] = $data->messageex;
-  $botdata["channel"] = empty($data->channel) ? "" : $data->channel;
-  $botdata["nick"] = $data->nick;
+  $botdata = filter_irc_data($data);
 
-  if (count($botdata["message"]) < 2) {
+  if (count($botdata['message']) < 2) {
     return 0;
   }
   $pullreq = new PullReq();
 
-  switch ($botdata["message"][0]) {
+  switch ($botdata['message'][0]) {
     case "addProject":
       $result = $pullreq->setProject($botdata);
       break;
 
     case "addMember":
-      if (count($botdata["message"]) < 3) {
+      if (count($botdata['message']) < 3) {
         return 0;
       }
       $result = $pullreq->setMember($botdata);
       break;
 
     case "delMember":
-      if (count($botdata["message"]) < 3) {
+      if (count($botdata['message']) < 3) {
         return 0;
       }
       $result = $pullreq->delMember($botdata);
@@ -86,14 +74,24 @@ function bot_pullreq_irc_msg_channel($data, $from_query = FALSE) {
       return 0;
   }
 
-  bot_message($to, $result["msg"]);
-
+  bot_message($botdata['to'], $result['msg']);
 }
 
 /**
  * Read query messages.
- * @param $data object with all information.
+ * @see bot_pullreq_irc_msg_channel()
  */
 function bot_pullreq_irc_msg_query($data) {
   bot_pullreq_irc_msg_channel($data, TRUE);
+}
+
+/**
+ * Filter IRC data.
+ */
+function filter_irc_data($data) {
+  return array(
+    'message' => $data->messageex,
+    'nick' => $data->nick,
+    'to' => empty($data->channel) ? $data->nick : $data->channel,
+  );
 }
