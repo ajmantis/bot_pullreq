@@ -198,8 +198,18 @@ class PullReq {
     }
     else {
       $members = explode(' ', $result);
-      $max_members = (count($members) - 1);
-      $this->result['msg'] = t('Our winner is .... : ') . $members[rand(0, $max_members)] . '!!';
+      $shouter = array_search($data['nick'], $members);
+
+      if ($shouter) {
+        unset($members[$shouter]);
+      }
+
+      if (count($members) > 0) {
+        $this->result['msg'] = t('Our winner is .... : ') . $members[array_rand($members)] . '!!';
+      }
+      else {
+        $this->result['msg'] = t("Don't be lazy, do it yourself.");
+      }
     }
     return $this->result;
   }
