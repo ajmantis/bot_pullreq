@@ -200,7 +200,7 @@ class PullReq {
       $members = explode(' ', $result);
       $shouter = array_search($data['nick'], $members);
 
-      if ($shouter) {
+      if ($shouter !== NULL) {
         unset($members[$shouter]);
       }
 

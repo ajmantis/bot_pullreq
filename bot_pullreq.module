@@ -95,3 +95,29 @@ function filter_irc_data($data) {
     'to' => empty($data->channel) ? $data->nick : $data->channel,
   );
 }
+
+/*
+PUBLIC NAME
+class Net_SmartIRC_data#115 (11) {
+  public $nick => string(7) "Saphyel"
+  public $channel => string(9) "#osgeo-es"
+  public $messageex =>
+  array(3) {
+  [0] => string(6) "Botijo"
+  [1] => string(3) "haz"
+  [2] => string(4) "algo"
+  }
+}
+
+PRIVATE NAME
+class Net_SmartIRC_data#115 (11) {
+  public $nick => string(7) "Saphyel"
+  public $channel => NULL
+  public $messageex =>
+  array(3) {
+  [0] => string(6) "Botijo"
+  [1] => string(2) "te"
+  [2] => string(4) "odio"
+  }
+}
+*/
